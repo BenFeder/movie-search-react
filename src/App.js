@@ -1,9 +1,12 @@
 import { useState, useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import axios from "axios";
 import "./App.css";
 import Navbar from "./components/Navbar";
-import Main from "./components/Main";
 import Footer from "./components/Footer";
 import Auth from "./components/Auth";
+import HomePage from "./pages/HomePage";
+import MovieDetailsPage from "./pages/MovieDetailsPage";
 import { auth } from "./firebase";
 import { onAuthStateChanged } from "firebase/auth";
 
@@ -32,8 +35,8 @@ function App() {
     setLoading(true);
     setCurrentPage(1);
     try {
-      const response = await fetch(`${API_URL}&s=${query}`);
-      const data = await response.json();
+      const response = await axios.get(`${API_URL}&s=${query}`);
+      const data = response.data;
 
       if (data.Response === "True") {
         setMovies(data.Search);
@@ -98,27 +101,42 @@ function App() {
   };
 
   return (
-    <div className="App">
-      <Navbar
-        searchQuery={searchQuery}
-        onSearch={handleSearch}
-        onInputChange={handleInputChange}
-        onKeyPress={handleKeyPress}
-        onContactClick={handleContactClick}
-        user={user}
-        onAuthClick={() => setShowAuth(true)}
-      />
-      <Main
-        movies={movies}
-        loading={loading}
-        onSortChange={handleSortChange}
-        user={user}
-        currentPage={currentPage}
-        onPageChange={handlePageChange}
-      />
-      <Footer onContactClick={handleContactClick} />
-      {showAuth && <Auth user={user} onClose={() => setShowAuth(false)} />}
-    </div>
+    <Router>
+      <div className="App">
+        <Navbar
+          searchQuery={searchQuery}
+          onSearch={handleSearch}
+          onInputChange={handleInputChange}
+          onKeyPress={handleKeyPress}
+          onContactClick={handleContactClick}
+          user={user}
+          onAuthClick={() => setShowAuth(true)}
+        />
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <HomePage
+                searchQuery={searchQuery}
+                onSearch={handleSearch}
+                onInputChange={handleInputChange}
+                onKeyPress={handleKeyPress}
+                movies={movies}
+                loading={loading}
+                onSortChange={handleSortChange}
+                sortOrder={sortOrder}
+                user={user}
+                currentPage={currentPage}
+                onPageChange={handlePageChange}
+              />
+            }
+          />
+          <Route path="/movie/:id" element={<MovieDetailsPage />} />
+        </Routes>
+        <Footer onContactClick={handleContactClick} />
+        {showAuth && <Auth user={user} onClose={() => setShowAuth(false)} />}
+      </div>
+    </Router>
   );
 }
 

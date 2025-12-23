@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import Pagination from "./Pagination";
 
 function Main({
@@ -52,7 +53,11 @@ function Main({
           <>
             <div className="movies-grid">
               {displayedMovies.map((movie) => (
-                <div key={movie.imdbID} className="movie-card">
+                <Link
+                  key={movie.imdbID}
+                  to={`/movie/${movie.imdbID}`}
+                  className="movie-card"
+                >
                   <img
                     src={
                       movie.Poster !== "N/A"
@@ -66,7 +71,7 @@ function Main({
                     <h3 className="movie-card__title">{movie.Title}</h3>
                     <p className="movie-card__year">{movie.Year}</p>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
 
